@@ -6,6 +6,10 @@ import random
 
 
 class Order():
+    """
+    Duża litera- restauracja
+    mała litera- punkt odbiory z restauracji o tej samej literze (tylko dużej)
+    """
     A = (0, 'A')
     a = (1, 'a')
     B = (2, 'B')
@@ -52,6 +56,53 @@ class Solver:
          [5, 9, 2, 6, 4, 8, 1, 10, 6, 8, 3, 6, 2, 2, 8, 3, 4, 7, inf, 6],
          [6, 1, 3, 5, 9, 2, 1, 2, 7, 10, 7, 5, 8, 4, 4, 1, 8, 8, inf, inf]]
     )
+    backpack_volume = 3
+    restaurants = [Order.A, Order.B, Order.C, Order.D, Order.E, Order.F, Order.G, Order.H, Order.I, Order.J] #przypisanie restauracji
+    customers = [Order.a, Order.b, Order.c, Order.d, Order.e, Order.f, Order.g, Order.h, Order.i, Order.j] #przypisanie klientów
+
+    def create_init_solution(self):
+        """
+        Funkcja generuje przykładowe rozwiazanie które jest możliwe ale nie koniecznie jest optymalne. (raczej napewno nie będzie)
+        ALE spełnia założenia modelu
+
+        :return: wektor możliwej drogi prezbytej przez kuriera
+        """
+
+        c_order = self.restaurants[:]
+        d_order = self.customers[:]
+        start_point = random.randint(0, len(c_order) - 1)
+        x_init = [c_order[start_point]]
+        backpack = [d_order[start_point]]
+        c_order.remove(c_order[start_point])
+        d_order.remove(d_order[start_point])
+
+
+        while len(x_init) != len(self.restaurants + self.customers):  # dopóki są zamówienia do odebrania lub do dostarczenia wykonuj
+
+            if len(backpack) < self.backpack_volume:  # jeśli ilosc w plecaku < pojemnosci plecaka wykonaj:
+                # dodanie restauracji albo towaru do plecaka
+                if random.randint(0, 1) == 0: #restauracji
+                    if c_order:
+                        next_point = 0
+                        if len(c_order) > 1:
+                            next_point = random.randint(0, len(c_order) - 1)
+                        x_init.append(c_order[next_point])
+                        backpack.append(d_order[next_point])
+                        c_order.remove(c_order[next_point])
+                        d_order.remove(d_order[next_point])
+                elif backpack:  # tutaj dodamy do sciezki klienta
+                    next_point = 0
+                    if len(backpack) > 1:
+                        next_point = random.randint(0, len(backpack) - 1)
+                    x_init.append(backpack[next_point])
+                    backpack.remove(backpack[next_point])
+            else:  # musimy dodac do sciezki klienta bo plecak jest pelny
+                next_point = random.randint(0, len(backpack) - 1)
+                x_init.append(backpack[next_point])
+                backpack.remove(backpack[next_point])
+        return x_init
+
 
 if __name__ == '__main__':
-
+    a=Solver()
+    print(a.create_init_solution())
