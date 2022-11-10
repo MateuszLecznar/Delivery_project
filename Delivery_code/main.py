@@ -1,14 +1,16 @@
-import math
 from math import inf
 import numpy as np
 import random
-
+"""
+Etap prac: Przygotowanie danych, generowanie przykładowego rozwiązania spełniającego warunek 3 zamówień w plecaku. 
+"""
 
 
 class Order():
     """
     Duża litera- restauracja
     mała litera- punkt odbiory z restauracji o tej samej literze (tylko dużej)
+    pierwsze miejsce w krotce liczba jeśli parzysta to punkt Odbioru jeśli nieparzysta punkt dostawy
     """
     A = (0, 'A')
     a = (1, 'a')
@@ -62,17 +64,19 @@ class Solver:
 
     def create_init_solution(self):
         """
-        Funkcja generuje przykładowe rozwiazanie które jest możliwe ale nie koniecznie jest optymalne. (raczej napewno nie będzie)
-        ALE spełnia założenia modelu
+        Funkcja generuje przykładowe rozwiazanie które jest możliwe ale nie koniecznie jest optymalne (raczej napewno nie będzie bo oparta na liczbie losowej)
+
 
         :return: wektor możliwej drogi prezbytej przez kuriera
         """
 
         c_order = self.restaurants[:]
         d_order = self.customers[:]
-        start_point = random.randint(0, len(c_order) - 1)
+        start_point = 0                            #random.randint(0, len(c_order) - 1)
         x_init = [c_order[start_point]]
-        backpack = [d_order[start_point]]
+
+        backpack = [d_order[start_point]] # włożenie pierwszego zamówienia do plecaka
+
         c_order.remove(c_order[start_point])
         d_order.remove(d_order[start_point])
 
@@ -96,6 +100,7 @@ class Solver:
                         next_point = random.randint(0, len(backpack) - 1)
                     x_init.append(backpack[next_point])
                     backpack.remove(backpack[next_point])
+
             else:  # musimy dodac do sciezki klienta bo plecak jest pelny
                 next_point = random.randint(0, len(backpack) - 1)
                 x_init.append(backpack[next_point])
@@ -104,5 +109,10 @@ class Solver:
 
 
 if __name__ == '__main__':
+    """
+    Przykładowa droga dostawcy, mimo że zaczyna z tego samego punktu droga jest inna ponieważ bazuje na losowości.
+    """
     a=Solver()
+    print(a.create_init_solution())
+    print(a.create_init_solution())
     print(a.create_init_solution())
