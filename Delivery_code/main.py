@@ -72,7 +72,8 @@ class Solver:
 
         c_order = self.restaurants[:]
         d_order = self.customers[:]
-        start_point = 0                            #random.randint(0, len(c_order) - 1)
+        start_point = 0  #random.randint(0, len(c_order) - 1)
+
         x_init = [c_order[start_point]]
 
         backpack = [d_order[start_point]] # włożenie pierwszego zamówienia do plecaka
@@ -97,7 +98,8 @@ class Solver:
                 elif backpack:  # tutaj dodamy do sciezki klienta
                     next_point = 0
                     if len(backpack) > 1:
-                        next_point = random.randint(0, len(backpack) - 1)
+
+                        next_point = random.randint(0, len(backpack) - 1)# wylosowanie do którego klienta z wzietych zamówien jedziemy
                     x_init.append(backpack[next_point])
                     backpack.remove(backpack[next_point])
 
@@ -107,12 +109,53 @@ class Solver:
                 backpack.remove(backpack[next_point])
         return x_init
 
+    def check_solution(self, route):
+        """
+        Funkcja zliczająca czas na cały przejazd oraz sprwdza czy aktualnie w plecaku jest makxymalnie 3 zamówienia
+        """
+        if route[0][1].islower():  # sprawdzamy czy pierwszy punkt jest miejscem dostawy czy odbiory zamówienia
+            return False
+        else:
+            tmp = [route[0]]
+
+        for el in route[1:]:
+            if el[1].islower() and (el[0] - 1, el[1].upper()) not in tmp:
+                return False
+            elif el[1].isupper():
+                tmp.append(el)
+
+        backpack = 0
+        for el in route:
+            if el[1].isupper():
+                backpack += 1
+            else:
+                backpack -= 1
+            if backpack > self.backpack_volume:
+                return print("Plecak przepełniony")
+
+        time = 0
+        prev_point = route[0]
+        for point in route[1:]:
+            time += self.cost_matrix[prev_point[0], point[0]]
+            prev_point = point
+
+        return print("Cały przejazd trwa :",time)
+
 
 if __name__ == '__main__':
     """
     Przykładowa droga dostawcy, mimo że zaczyna z tego samego punktu droga jest inna ponieważ bazuje na losowości.
     """
     a=Solver()
-    print(a.create_init_solution())
-    print(a.create_init_solution())
-    print(a.create_init_solution())
+
+    solution1=a.create_init_solution()
+    print(solution1)
+    a.check_solution(solution1)
+
+    solution2 = a.create_init_solution()
+    print(solution2)
+    a.check_solution(solution2)
+
+    solution3=a.create_init_solution()
+    print(solution3)
+    a.check_solution(solution3)
