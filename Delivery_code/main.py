@@ -1,6 +1,7 @@
 from math import inf
 import numpy as np
 import random
+
 """
 Etap prac: Przygotowanie danych, generowanie przykładowego rozwiązania spełniającego warunek 3 zamówień w plecaku. 
 """
@@ -59,8 +60,10 @@ class Solver:
          [6, 1, 3, 5, 9, 2, 1, 2, 7, 10, 7, 5, 8, 4, 4, 1, 8, 8, inf, inf]]
     )
     backpack_volume = 3
-    restaurants = [Order.A, Order.B, Order.C, Order.D, Order.E, Order.F, Order.G, Order.H, Order.I, Order.J] #przypisanie restauracji
-    customers = [Order.a, Order.b, Order.c, Order.d, Order.e, Order.f, Order.g, Order.h, Order.i, Order.j] #przypisanie klientów
+    restaurants = [Order.A, Order.B, Order.C, Order.D, Order.E, Order.F, Order.G, Order.H, Order.I,
+                   Order.J]  # przypisanie restauracji
+    customers = [Order.a, Order.b, Order.c, Order.d, Order.e, Order.f, Order.g, Order.h, Order.i,
+                 Order.j]  # przypisanie klientów
 
     def create_init_solution(self):
         """
@@ -72,21 +75,21 @@ class Solver:
 
         c_order = self.restaurants[:]
         d_order = self.customers[:]
-        start_point = 0  #random.randint(0, len(c_order) - 1)
+        start_point = 0  # random.randint(0, len(c_order) - 1)
 
         x_init = [c_order[start_point]]
 
-        backpack = [d_order[start_point]] # włożenie pierwszego zamówienia do plecaka
+        backpack = [d_order[start_point]]  # włożenie pierwszego zamówienia do plecaka
 
         c_order.remove(c_order[start_point])
         d_order.remove(d_order[start_point])
 
-
-        while len(x_init) != len(self.restaurants + self.customers):  # dopóki są zamówienia do odebrania lub do dostarczenia wykonuj
+        while len(x_init) != len(
+                self.restaurants + self.customers):  # dopóki są zamówienia do odebrania lub do dostarczenia wykonuj
 
             if len(backpack) < self.backpack_volume:  # jeśli ilosc w plecaku < pojemnosci plecaka wykonaj:
                 # dodanie restauracji albo towaru do plecaka
-                if random.randint(0, 1) == 0: #restauracji
+                if random.randint(0, 1) == 0:  # restauracji
                     if c_order:
                         next_point = 0
                         if len(c_order) > 1:
@@ -98,8 +101,8 @@ class Solver:
                 elif backpack:  # tutaj dodamy do sciezki klienta
                     next_point = 0
                     if len(backpack) > 1:
-
-                        next_point = random.randint(0, len(backpack) - 1)# wylosowanie do którego klienta z wzietych zamówien jedziemy
+                        next_point = random.randint(0,
+                                                    len(backpack) - 1)  # wylosowanie do którego klienta z wzietych zamówien jedziemy
                     x_init.append(backpack[next_point])
                     backpack.remove(backpack[next_point])
 
@@ -139,23 +142,45 @@ class Solver:
             time += self.cost_matrix[prev_point[0], point[0]]
             prev_point = point
 
-        return print("Cały przejazd trwa :",time)
+        return print("Cały przejazd trwa :", time)
+
+    def calculate_single_delivery(self, route):
+        """" Funkcja zlicza czas dojazdu od danej restauracji do klienta"""
+        if route[0][1].islower():  # sprawdzamy czy pierwszy punkt jest miejscem dostawy czy odbiory zamówienia( sprawdza dane wejściowe)
+            return False
+        temp_route = route
+        single_time = []
+        tuple_time = []
+
+        while (temp_route):
+
+            iter = 1
+            while True:
+                if temp_route[iter][1] != temp_route[0][1].lower():
+                    single_time.append(self.cost_matrix[temp_route[0][0], temp_route[iter][0]])
+
+                    iter += 1
+
+                elif temp_route[iter][1] == temp_route[0][1].lower():
+
+                    single_time.append(self.cost_matrix[temp_route[0][0], temp_route[iter][0]])
+
+                    tuple_time.append((temp_route[0][1], sum(single_time)))
+                    single_time.clear()
+                    temp_route.pop(iter)
+                    temp_route.pop(0)
+
+                    break
+        return tuple_time
 
 
 if __name__ == '__main__':
     """
     Przykładowa droga dostawcy, mimo że zaczyna z tego samego punktu droga jest inna ponieważ bazuje na losowości.
     """
-    a=Solver()
+    a = Solver()
 
-    solution1=a.create_init_solution()
+    solution1 = a.create_init_solution()
     print(solution1)
     a.check_solution(solution1)
-
-    solution2 = a.create_init_solution()
-    print(solution2)
-    a.check_solution(solution2)
-
-    solution3=a.create_init_solution()
-    print(solution3)
-    a.check_solution(solution3)
+    print(a.calculate_single_delivery(solution1))
