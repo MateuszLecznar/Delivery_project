@@ -178,7 +178,21 @@ if __name__ == '__main__':
     """
     Przykładowa droga dostawcy, mimo że zaczyna z tego samego punktu droga jest inna ponieważ bazuje na losowości.
     """
+    def findchanges(lista):
+        tab = []
+        for i in lista:
+            tabtab = []
+            temp = 0
+            if i[1].isupper() is True:
+                for j in lista:
+                    if temp > 0 and j[1].isupper() is True:
+                        tabtab.append(j)
+                    if j == i:
+                        temp += 1
+                tab.append(tabtab)
+        return tab
     a = Solver()
+    print(findchanges(a.create_init_solution()))
 
     solution1 = a.create_init_solution()
     print(solution1)
