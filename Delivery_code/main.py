@@ -1,3 +1,4 @@
+import copy
 from math import inf
 import numpy as np
 import random
@@ -165,7 +166,7 @@ class Solver:
 
                     single_time.append(self.cost_matrix[temp_route[0][0], temp_route[iter][0]])
 
-                    tuple_time.append((temp_route[0][1], sum(single_time)))
+                    tuple_time.append((temp_route[0][1],temp_route[0][1].lower(), sum(single_time)))
                     single_time.clear()
                     temp_route.pop(iter)
                     temp_route.pop(0)
@@ -173,28 +174,86 @@ class Solver:
                     break
         return tuple_time
 
+    def list_to_swap(self):
+        """ Funkcja generuje liste możliwych wszystkich podmian potrzebną później do znalezienia najlepszej podmiany"""
+        copy_restaurants=copy.deepcopy(self.restaurants)
+        copy_customer=copy.deepcopy(self.customers)
+        list_restaurant_to_swap=[]
+        list_customer_to_swap=[]
+
+
+        for rest in self.restaurants:
+            list_to_swap_display=[]
+            for copy_rest in copy_restaurants:
+                if rest[1] != copy_rest[1]:
+                    list_restaurant_to_swap.append((rest[1],copy_rest[1]))
+                    list_to_swap_display.append((rest[1],copy_rest[1]))
+            copy_restaurants.pop(0)
+            print(list_to_swap_display)
+
+        for rest in self.customers:
+
+            for copy_rest in copy_restaurants:
+                if rest[1] != copy_rest[1]:
+                    list_customer_to_swap.append((rest[1],copy_rest[1]))
+
+            copy_customer.pop(0)
+
+
+        return list_restaurant_to_swap
+
+def findchanges(lista):
+    tab = []
+    for i in lista:
+        tabtab = []
+        temp = 0
+        if i[1].isupper() is True:
+            for j in lista:
+                if temp > 0 and j[1].isupper() is True:
+                    tabtab.append(j)
+                if j == i:
+                    temp += 1
+            tab.append(tabtab)
+    return tab
+def print_road(solution):
+    for el in solution:
+        if el is solution[-1]:
+            print(el[1])
+        else:
+            print(el[1],end=" -> ")
+
+    print("\n")
+def print_award_time(time_):
+    sum_award=0
+    for i in time_:
+        award=0
+        if i[2]<5:
+            award=40
+        if i[2]<10 and i[2]>=5:
+            award=30
+        if i[2]<20 and i[2]>=10 :
+            award=20
+        if i[2]<30 and i[2]>=20:
+            award=10
+        if i[2]<40 and i[2]>=30:
+            award=5
+        sum_award+=award
+        print(i,"   Nagroda: ",award,"pln")
+    print("NAGRODA ZA CAŁY PRZEJAZD: ",sum_award,"pln")
 
 if __name__ == '__main__':
-    """
-    Przykładowa droga dostawcy, mimo że zaczyna z tego samego punktu droga jest inna ponieważ bazuje na losowości.
-    """
-    def findchanges(lista):
-        tab = []
-        for i in lista:
-            tabtab = []
-            temp = 0
-            if i[1].isupper() is True:
-                for j in lista:
-                    if temp > 0 and j[1].isupper() is True:
-                        tabtab.append(j)
-                    if j == i:
-                        temp += 1
-                tab.append(tabtab)
-        return tab
-    a = Solver()
-    print(findchanges(a.create_init_solution()))
 
+    a = Solver()
     solution1 = a.create_init_solution()
-    print(solution1)
+    print("\nGenerowanie przykładowego rozwiązania:")
+    print_road(solution1)
     a.check_solution(solution1)
-    print(a.calculate_single_delivery(solution1))
+    print("\nCzas dostaw z restauracji do jej punktu odbioru w trakcie przejazdu")
+    print_award_time(a.calculate_single_delivery(copy.deepcopy(solution1)))
+
+
+    print("\n\nWszystkie możliwości podmian")
+    a.list_to_swap()
+
+
+
