@@ -1,4 +1,5 @@
 import copy
+import math
 from math import inf
 import numpy as np
 import random
@@ -177,30 +178,83 @@ class Solver:
     def list_to_swap(self):
         """ Funkcja generuje liste możliwych wszystkich podmian potrzebną później do znalezienia najlepszej podmiany"""
         copy_restaurants=copy.deepcopy(self.restaurants)
-        copy_customer=copy.deepcopy(self.customers)
         list_restaurant_to_swap=[]
-        list_customer_to_swap=[]
 
-
+        list_to_swap_display = []
         for rest in self.restaurants:
-            list_to_swap_display=[]
+
             for copy_rest in copy_restaurants:
                 if rest[1] != copy_rest[1]:
                     list_restaurant_to_swap.append((rest[1],copy_rest[1]))
                     list_to_swap_display.append((rest[1],copy_rest[1]))
             copy_restaurants.pop(0)
-            print(list_to_swap_display)
+            #print(list_to_swap_display)
 
-        for rest in self.customers:
 
-            for copy_rest in copy_restaurants:
-                if rest[1] != copy_rest[1]:
-                    list_customer_to_swap.append((rest[1],copy_rest[1]))
-
-            copy_customer.pop(0)
 
 
         return list_restaurant_to_swap
+
+
+    def best_change_result(self,swing_list,solution):
+        """ Funkcja podmienia i przelicza czy po podmianie jest lepiej.
+            Jeśli znajdzie najlepszą podmianę, podmieni i zwróci trasę i swing listę bez elementów podmiany
+            return: najlepsza droga, nagroda za tą trasę, reszta możliwych podmian"""
+        best_salary=0
+        orginal_solution=copy.deepcopy(solution)
+        best_solution=[]
+        #print(swing_list)
+        #print(solution)
+        index_1_big=0
+        index_2_big=0
+        index_1_small=0
+        index_2_small=0
+
+        index_to_delate_from_swap_list=0
+
+
+        for swing in swing_list:
+            for i in range(len(solution)):
+
+            #PODMIANA DUŻYCH LITER
+                if solution[i][1] == swing[0]:
+                    index_1_big=i
+
+                elif solution[i][1] == swing[1]:
+                    index_2_big = i
+
+            #podmiana małych liter
+
+                elif solution[i][1] == swing[0].lower():
+                    index_1_small=i
+                elif solution[i][1] == swing[1].lower():
+                    index_2_small=i
+
+            solution[index_1_big],solution[index_2_big]=solution[index_2_big],solution[index_1_big]
+            solution[index_1_small], solution[index_2_small] = solution[index_2_small], solution[index_1_small]
+
+
+            #porównanie nagrody
+            award = print_award_time(self.calculate_single_delivery(copy.deepcopy(solution)))
+            if award>best_salary:
+                index_to_delate_from_swap_list=swing_list.index(swing)
+                best_solution = copy.deepcopy(solution)
+                best_salary=award
+            #print_road(solution)
+            #powrót do oryginalnych danych
+            solution = copy.deepcopy(orginal_solution)
+
+        #print_road(best_solution)
+        print("Nowa nagroda: ",best_salary,"PLN")
+        print("Nastąpiła najlepsza podmiana: ",swing_list.pop(index_to_delate_from_swap_list))
+        return best_solution,best_salary,swing_list
+
+
+
+
+
+
+
 
 def findchanges(lista):
     tab = []
@@ -215,6 +269,8 @@ def findchanges(lista):
                     temp += 1
             tab.append(tabtab)
     return tab
+
+
 def print_road(solution):
     for el in solution:
         if el is solution[-1]:
@@ -238,8 +294,12 @@ def print_award_time(time_):
         if i[2]<40 and i[2]>=30:
             award=5
         sum_award+=award
-        print(i,"   Nagroda: ",award,"pln")
-    print("NAGRODA ZA CAŁY PRZEJAZD: ",sum_award,"pln")
+        #print(i,"   Nagroda: ",award,"pln")
+    #print("NAGRODA ZA CAŁY PRZEJAZD: ",sum_award,"pln")
+    return sum_award
+
+
+
 
 if __name__ == '__main__':
 
@@ -248,12 +308,14 @@ if __name__ == '__main__':
     print("\nGenerowanie przykładowego rozwiązania:")
     print_road(solution1)
     a.check_solution(solution1)
-    print("\nCzas dostaw z restauracji do jej punktu odbioru w trakcie przejazdu")
-    print_award_time(a.calculate_single_delivery(copy.deepcopy(solution1)))
+    print("nagroda przed podminą: ",print_award_time(a.calculate_single_delivery(copy.deepcopy(solution1))),"PLN")
+    print_road(solution1)
 
 
-    print("\n\nWszystkie możliwości podmian")
-    a.list_to_swap()
+    data=a.best_change_result(a.list_to_swap(),copy.deepcopy(solution1))
+    a.check_solution(data[0])
+    print_road(data[0])
 
+    # Trzeba ustalić wagę na jak długo będzie w tablisy taboo ( jeszcze nie zaimplementowabna) ta podmianka, pewnie coś związane z długością całej drogi
 
 
