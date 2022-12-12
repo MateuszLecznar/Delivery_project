@@ -3,6 +3,8 @@ import math
 from math import inf
 import numpy as np
 import random
+import sys
+sys.setrecursionlimit(100)
 
 """
 Etap prac: Przygotowanie danych, generowanie przykładowego rozwiązania spełniającego warunek 3 zamówień w plecaku. 
@@ -246,11 +248,37 @@ class Solver:
 
         #print_road(best_solution)
         print("Nowa nagroda: ",best_salary,"PLN")
-        print("Nastąpiła najlepsza podmiana: ",swing_list.pop(index_to_delate_from_swap_list))
-        return best_solution,best_salary,swing_list
+        used_swap=swing_list.pop(index_to_delate_from_swap_list)
+        print("Nastąpiła najlepsza podmiana: ",used_swap)
+        return best_solution,best_salary,swing_list,used_swap
+
+    def add_to_taboo(self,used_swap, taboo, list_to_swap):
+        """ Funkcja dodaje do tablicy taboo wykonane podmiany oraz zwraca te które juz w niej były za długo"""
 
 
+        taboo.append(used_swap)
+        if len(taboo)>=4:  #Zmiana ile iterazji musi być w taboo podmiana
+            list_to_swap.insert(0,taboo.pop(0))
 
+        re=[]
+        re.append(list_to_swap)
+        re.append(taboo)
+        return re
+    def made_next_solution(self,a,solution,data,taboo):
+        """Funcka generuje rozwiązanie i wykonuje operacje do kolejnych iteracji"""
+
+
+        print(taboo)
+        abc=a.add_to_taboo(data[3],taboo,data[2])
+
+        abc[0]=data[2]
+        abc[1]=taboo
+        print(taboo)
+        data = a.best_change_result(data[2], solution)
+        a.check_solution(data[0])
+        print_road(data[0])
+
+        return a,data[0],data,taboo
 
 
 
@@ -285,11 +313,17 @@ def print_award_time(time_):
         award=0
         if i[2]<5:
             award=40
-        if i[2]<10 and i[2]>=5:
+        if i[2]<8 and i[2]>=5:
+            award=35
+        if i[2]<10 and i[2]>=8:
             award=30
-        if i[2]<20 and i[2]>=10 :
+        if i[2]<15 and i[2]>=10 :
+            award=25
+        if i[2]<20 and i[2]>=15 :
             award=20
-        if i[2]<30 and i[2]>=20:
+        if i[2] < 25 and i[2] >= 20:
+            award = 15
+        if i[2]<30 and i[2]>=25:
             award=10
         if i[2]<40 and i[2]>=30:
             award=5
@@ -315,7 +349,14 @@ if __name__ == '__main__':
     data=a.best_change_result(a.list_to_swap(),copy.deepcopy(solution1))
     a.check_solution(data[0])
     print_road(data[0])
+    taboo=[data[3]]
 
-    # Trzeba ustalić wagę na jak długo będzie w tablisy taboo ( jeszcze nie zaimplementowabna) ta podmianka, pewnie coś związane z długością całej drogi
 
+    object=a
+    sol=solution1
+    dat_1=data
+    tab=taboo
+    for i in range(10):
+        object,sol,dat_1,tab=a.made_next_solution(object,sol,dat_1,tab)
 
+#Rekurencyjnie wywoływanie kolejnych powtórzeń
