@@ -254,26 +254,35 @@ class Solver:
 
     def add_to_taboo(self,used_swap, taboo, list_to_swap):
         """ Funkcja dodaje do tablicy taboo wykonane podmiany oraz zwraca te które juz w niej były za długo"""
+        #Lisa możliwych podmian jest już bez used_swap
+        print("sdds",used_swap,taboo,list_to_swap)
+        re = []
+        if taboo[0]==used_swap:
+            re.append(taboo)
+        else:
+            taboo.append(used_swap)
+            re.append(taboo)
 
-
-        taboo.append(used_swap)
-        if len(taboo)>=4:  #Zmiana ile iterazji musi być w taboo podmiana
+        if len(taboo)>=23:  #Zmiana ile iterazji musi być w taboo podmiana
             list_to_swap.insert(0,taboo.pop(0))
 
-        re=[]
         re.append(list_to_swap)
-        re.append(taboo)
+
         return re
     def made_next_solution(self,a,solution,data,taboo):
         """Funcka generuje rozwiązanie i wykonuje operacje do kolejnych iteracji"""
-
+        """ data - > best_solution,best_salary,swing_list,used_swap"""
 
         print(taboo)
+        abc=[]
+
         abc=a.add_to_taboo(data[3],taboo,data[2])
 
-        abc[0]=data[2]
-        abc[1]=taboo
+        abc[1]=data[2]
+        abc[0]=taboo
+
         print(taboo)
+
         data = a.best_change_result(data[2], solution)
         a.check_solution(data[0])
         print_road(data[0])
@@ -356,7 +365,6 @@ if __name__ == '__main__':
     sol=solution1
     dat_1=data
     tab=taboo
-    for i in range(10):
+    for i in range(100):
         object,sol,dat_1,tab=a.made_next_solution(object,sol,dat_1,tab)
 
-#Rekurencyjnie wywoływanie kolejnych powtórzeń
