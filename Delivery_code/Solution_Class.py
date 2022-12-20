@@ -178,6 +178,35 @@ class Solver:
 
         return list_restaurant_to_swap
 
+    def list_to_swap_single(self):
+
+        copy_restaurants = copy.deepcopy(self.restaurants)
+        list_restaurant_to_swap = []
+
+        for rest in self.restaurants:
+
+            for copy_rest in copy_restaurants:
+                if rest[1] != copy_rest[1]:
+                    list_restaurant_to_swap.append((rest[1], copy_rest[1]))
+            copy_restaurants.pop(0)
+
+        copy_customers = copy.deepcopy(self.customers)
+
+        for rest in self.restaurants:
+
+            for copy_cust in copy_customers:
+                list_restaurant_to_swap.append((rest[1], copy_cust[1]))
+
+        i = 0
+        while i < len(list_restaurant_to_swap):
+            if list_restaurant_to_swap[i][0] == list_restaurant_to_swap[i][1].swapcase():
+                list_restaurant_to_swap.pop(i)
+                i = i - 1
+            else:
+                i = i + 1
+
+        return list_restaurant_to_swap
+
     def best_change_result(self, swing_list, solution):
         """
                 Funkcja podmienia i przelicza czy po podmianie jest lepiej.
@@ -225,6 +254,109 @@ class Solver:
                 index_to_delate_from_swap_list = swing_list.index(swing)
                 best_solution = copy.deepcopy(solution)
                 best_salary = award
+
+            solution = copy.deepcopy(orginal_solution)
+
+        print("Nowa nagroda: ", best_salary, "PLN")
+        used_swap = swing_list.pop(index_to_delate_from_swap_list)
+        print("Nastąpiła najlepsza podmiana: ", used_swap)
+        return best_solution, best_salary, swing_list, used_swap
+
+    def best_change_result(self, swing_list, solution):
+        """
+                Funkcja podmienia i przelicza czy po podmianie jest lepiej.
+            Jeśli znajdzie najlepszą podmianę, podmieni i zwróci trasę i swing listę bez elementów podmiany
+
+
+        :param swing_list: lista możliwych podmian
+        :param solution: nasza droga jaką obecnie mamy wyznaczoną
+        :return: najlepsza droga, nagroda za tą trasę, reszta możliwych podmian, użyta podmiana
+        """
+
+        best_salary = 0
+        orginal_solution = copy.deepcopy(solution)
+        best_solution = []
+        index_1_big = 0
+        index_2_big = 0
+        index_1_small = 0
+        index_2_small = 0
+
+        index_to_delate_from_swap_list = 0
+
+        for swing in swing_list:
+            for i in range(len(solution)):
+
+                # PODMIANA DUŻYCH LITER
+                if solution[i][1] == swing[0]:
+                    index_1_big = i
+
+                elif solution[i][1] == swing[1]:
+                    index_2_big = i
+
+                # podmiana małych liter
+
+                elif solution[i][1] == swing[0].lower():
+                    index_1_small = i
+                elif solution[i][1] == swing[1].lower():
+                    index_2_small = i
+
+            solution[index_1_big], solution[index_2_big] = solution[index_2_big], solution[index_1_big]
+            solution[index_1_small], solution[index_2_small] = solution[index_2_small], solution[index_1_small]
+
+            # porównanie nagrody
+            award = calculate_award_time(self.calculate_single_delivery(copy.deepcopy(solution)))
+            if award > best_salary:
+                index_to_delate_from_swap_list = swing_list.index(swing)
+                best_solution = copy.deepcopy(solution)
+                best_salary = award
+
+            solution = copy.deepcopy(orginal_solution)
+
+        print("Nowa nagroda: ", best_salary, "PLN")
+        used_swap = swing_list.pop(index_to_delate_from_swap_list)
+        print("Nastąpiła najlepsza podmiana: ", used_swap)
+        return best_solution, best_salary, swing_list, used_swap
+
+    def best_change_result_single(self, swing_list, solution):
+
+        best_salary = 0
+        orginal_solution = copy.deepcopy(solution)
+        best_solution = []
+        index_1 = 0
+        index_2 = 0
+
+        index_to_delate_from_swap_list = 0
+
+        for swing in swing_list:
+            for i in range(len(solution)):
+
+                if solution[i][1] == swing[0]:
+                    index_1 = i
+
+                elif solution[i][1] == swing[1]:
+                    index_2 = i
+
+            solution[index_1], solution[index_2] = solution[index_2], solution[index_1]
+
+            is_possible = True
+            lower_letter = []
+            for i in solution:
+                if i[1].islower():
+                    lower_letter.append(i[1])
+                else:
+                    if lower_letter:
+                        copy_letter = i[1].swapcase()
+                        for j in lower_letter:
+                            if copy_letter == j:
+                                is_possible = False
+                                break
+
+            if is_possible:
+                award = calculate_award_time(self.calculate_single_delivery(copy.deepcopy(solution)))
+                if award > best_salary:
+                    index_to_delate_from_swap_list = swing_list.index(swing)
+                    best_solution = copy.deepcopy(solution)
+                    best_salary = award
 
             solution = copy.deepcopy(orginal_solution)
 
