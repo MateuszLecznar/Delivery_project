@@ -262,61 +262,6 @@ class Solver:
         print("Nastąpiła najlepsza podmiana: ", used_swap)
         return best_solution, best_salary, swing_list, used_swap
 
-    def best_change_result(self, swing_list, solution):
-        """
-                Funkcja podmienia i przelicza czy po podmianie jest lepiej.
-            Jeśli znajdzie najlepszą podmianę, podmieni i zwróci trasę i swing listę bez elementów podmiany
-
-
-        :param swing_list: lista możliwych podmian
-        :param solution: nasza droga jaką obecnie mamy wyznaczoną
-        :return: najlepsza droga, nagroda za tą trasę, reszta możliwych podmian, użyta podmiana
-        """
-
-        best_salary = 0
-        orginal_solution = copy.deepcopy(solution)
-        best_solution = []
-        index_1_big = 0
-        index_2_big = 0
-        index_1_small = 0
-        index_2_small = 0
-
-        index_to_delate_from_swap_list = 0
-
-        for swing in swing_list:
-            for i in range(len(solution)):
-
-                # PODMIANA DUŻYCH LITER
-                if solution[i][1] == swing[0]:
-                    index_1_big = i
-
-                elif solution[i][1] == swing[1]:
-                    index_2_big = i
-
-                # podmiana małych liter
-
-                elif solution[i][1] == swing[0].lower():
-                    index_1_small = i
-                elif solution[i][1] == swing[1].lower():
-                    index_2_small = i
-
-            solution[index_1_big], solution[index_2_big] = solution[index_2_big], solution[index_1_big]
-            solution[index_1_small], solution[index_2_small] = solution[index_2_small], solution[index_1_small]
-
-            # porównanie nagrody
-            award = calculate_award_time(self.calculate_single_delivery(copy.deepcopy(solution)))
-            if award > best_salary:
-                index_to_delate_from_swap_list = swing_list.index(swing)
-                best_solution = copy.deepcopy(solution)
-                best_salary = award
-
-            solution = copy.deepcopy(orginal_solution)
-
-        print("Nowa nagroda: ", best_salary, "PLN")
-        used_swap = swing_list.pop(index_to_delate_from_swap_list)
-        print("Nastąpiła najlepsza podmiana: ", used_swap)
-        return best_solution, best_salary, swing_list, used_swap
-
     def best_change_result_single(self, swing_list, solution):
 
         best_salary = 0
