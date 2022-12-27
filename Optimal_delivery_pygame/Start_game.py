@@ -9,13 +9,12 @@ from Class_Hungry_man import Hungry_man
 from add_restaurants import generate_restaurant
 from create_cost_matrix import prepared_matrix
 from display_elements import element_to_display
-from generate_rand_solution import first_generate
 from move_dron import Dron
 from next_solutions import next_solution_by_iter
 from print_road import road_str_without_arrow
 
 
-def window(start):
+def window(start, random_object_solution, road, long_taboo, max_iter):
     if start:
 
         pygame.init()
@@ -30,8 +29,7 @@ def window(start):
         run = True
         flag_single_show = True
         flag_button_show = False
-        start_stop = False
-        road = []
+
         dron = Dron(300, 300)
         road_for_dron = ""
         while run:
@@ -55,17 +53,26 @@ def window(start):
                 flag_button_show = True
                 out_matrix = prepared_matrix(count_order, men, list_restaurant)
 
-                random_object_solution, road = first_generate()
+                best_salary = 0
+                best_finish_road = []
 
-                finish_road = next_solution_by_iter(100, 23, copy.deepcopy(random_object_solution), copy.deepcopy(road),
-                                                    out_matrix)
+                for el in long_taboo:
+                    finish_road = []
+                    best_salary_temp = []
+                    finish_road, best_salary_temp = next_solution_by_iter(max_iter, el,
+                                                                          copy.deepcopy(random_object_solution),
+                                                                          copy.deepcopy(road),
+                                                                          out_matrix)
+                    if best_salary < best_salary_temp:
+                        best_salary = best_salary_temp
+                        best_finish_road = finish_road
 
-                road = finish_road
-                road_for_dron = road_str_without_arrow(finish_road)
+                road_for_dron = road_str_without_arrow(best_finish_road)
 
             element_to_display(count_order, max_restaurants, positions_restaurants, men, list_restaurant, window, road)
 
             if flag_button_show:
+
                 button = Button(550, 0)
                 button.draw(window)
                 button.clicked = button.check_click()

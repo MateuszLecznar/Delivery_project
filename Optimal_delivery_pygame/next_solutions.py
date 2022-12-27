@@ -47,7 +47,10 @@ def next_solution_by_iter(number_of_iterations, length_taboo, random_object_solu
     long_taboo = random_object_solution.max_taboo
     long_taboo = str(long_taboo)
     plt.title("Nagroda po kolejnych iteracjach algorytmu. Długość tablicy taboo:" + long_taboo)
+    plt.xlabel("Numer iteracji")
+    plt.ylabel("Uzyskana nagroda w PLN")
     plt.show()
     # print(random_object_solution.cost_matrix)
-    print("NAJLEPSZE ROZWIĄZANIE UZYSKANO PO ", minimium_iteration, " ITERACJACH")
-    return best_road
+    print("NAJLEPSZE ROZWIĄZANIE UZYSKANO PO ", minimium_iteration + 1, " ITERACJACH DLA DŁUGOŚĆI TABLICY TABOO ",
+          length_taboo, "UZYSKANA NAGRODA: ", best_salary)
+    return best_road, best_salary
