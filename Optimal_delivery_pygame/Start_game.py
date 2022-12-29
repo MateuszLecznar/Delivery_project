@@ -48,28 +48,31 @@ def window(start, random_object_solution, road, long_taboo, max_iter):
                         count_order = count_order + 1
             time.sleep(0.03)
 
+
             if count_order == max_restaurants and flag_single_show:
                 flag_single_show = False
                 flag_button_show = True
                 out_matrix = prepared_matrix(count_order, men, list_restaurant)
 
                 best_salary = 0
-                best_finish_road = []
+                best_finish_road=[]
 
                 for el in long_taboo:
-                    finish_road = []
+                    finish_road = road
                     best_salary_temp = []
                     finish_road, best_salary_temp = next_solution_by_iter(max_iter, el,
                                                                           copy.deepcopy(random_object_solution),
-                                                                          copy.deepcopy(road),
+                                                                          copy.deepcopy(finish_road),
                                                                           out_matrix)
                     if best_salary < best_salary_temp:
                         best_salary = best_salary_temp
                         best_finish_road = finish_road
 
                 road_for_dron = road_str_without_arrow(best_finish_road)
+                road=best_finish_road
+            element_to_display(count_order, max_restaurants, positions_restaurants, men, list_restaurant, window,road)
 
-            element_to_display(count_order, max_restaurants, positions_restaurants, men, list_restaurant, window, road)
+
 
             if flag_button_show:
 

@@ -3,7 +3,7 @@ import pygame
 from print_road import road_str
 
 
-def element_to_display(count_order, max_restaurants, positions_restaurants, men, list_restaurant, window, solution):
+def element_to_display(count_order, max_restaurants, positions_restaurants, men, list_restaurant, window, solution=None):
     """
 
     :param count_order:
