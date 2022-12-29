@@ -36,6 +36,7 @@ class Solver:
     )
     backpack_volume = 3
     max_taboo = 23
+    next_iter_next_award=[]
 
     def lenght_taboo(self, lenght_taboo):
         self.max_taboo = lenght_taboo
@@ -258,6 +259,7 @@ class Solver:
             solution = copy.deepcopy(orginal_solution)
 
         print("Nowa nagroda: ", best_salary, "PLN")
+        self.next_iter_next_award.append(best_salary) #dopisanie nagrody
         used_swap = swing_list.pop(index_to_delate_from_swap_list)
         print("Nastąpiła najlepsza podmiana: ", used_swap)
         return best_solution, best_salary, swing_list, used_swap

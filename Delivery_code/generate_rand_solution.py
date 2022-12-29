@@ -15,7 +15,7 @@ def first_generate():
     print("\nGenerowanie przykładowego rozwiązania:")
     print_road(road)
     object.check_solution(road)
-    print("nagroda przed podminą: ", calculate_award_time(object.calculate_single_delivery(copy.deepcopy(road))), "PLN")
+    print("Nagroda przed podminą: ", calculate_award_time(object.calculate_single_delivery(copy.deepcopy(road))), "PLN")
     print_road(road)
 
     return object, road

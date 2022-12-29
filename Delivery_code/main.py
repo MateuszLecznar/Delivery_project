@@ -1,8 +1,11 @@
+import copy
+
 from next_solutions import next_solution_by_iter
+from generate_rand_solution import first_generate
 
 """Etap prac:
 Uporządkowany kod 
-generowanie rozwiązania z podmianami parami 
+generowanie rozwiązania z podmianami parami
 możliwa łatwa zmiana ilości iteracji i długości tablicy taboo 
 
 """
@@ -10,17 +13,19 @@ możliwa łatwa zmiana ilości iteracji i długości tablicy taboo
 """
 PLan działania:
 
-zaspis do pliku csv danych by:
-
-wygenerować wykres ilości iteracji od wysokości nagrody 
-wykres długości tablicy taboo od wysokości nagrody dla 100 iteracji 
-
+zrobnić podmianę pojedyńczych elementów 
 """
 
 if __name__ == '__main__':
+
+
     """
     Parametry 
     1. Ilość iteracji 
     2. Długość tablicy taboo 
     """
-    next_solution_by_iter(30, 5)
+    """ Dla jednego """
+    next_solution_by_iter(100, 40)
+    next_solution_by_iter(100,20)
+    next_solution_by_iter(100, 10)
+    next_solution_by_iter(100, 5)
