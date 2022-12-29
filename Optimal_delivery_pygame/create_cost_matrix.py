@@ -53,6 +53,7 @@ def prepared_matrix(count_order, men, list_restaurant):
         matrix = np.array(create_cost_matrix(men, list_restaurant))
         matrix = matrix.T
         matrix = matrix / 40  # Norlamlizuje by nie zmieniac nagród i wykorzystać funkcję do liczenia nagrody
+        print(matrix)
         return matrix
     else:
         return False

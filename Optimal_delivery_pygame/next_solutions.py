@@ -13,7 +13,7 @@ def next_solution_by_iter(number_of_iterations, length_taboo, random_object_solu
     generuje listę możlwiych podmian
     iteruje zadaną liczbę razy
 
-    :param number_of_iterations: liczba iteracji czyli podmian w algorytmie taboo
+    :param number_of_iterations: długość tablicy taboo
     :param length_taboo - długość tablicy taboo
     :return:
     """
@@ -26,6 +26,7 @@ def next_solution_by_iter(number_of_iterations, length_taboo, random_object_solu
     random_object_solution.lenght_taboo(length_taboo)
     list_to_swap = random_object_solution.list_to_swap_pairs()
 
+    #Generowanie pierwszego rozwiązania
     data = random_object_solution.best_change_result(list_to_swap, road)
     random_object_solution.check_solution(data[0])
 
@@ -36,8 +37,18 @@ def next_solution_by_iter(number_of_iterations, length_taboo, random_object_solu
     best_road = []
     minimium_iteration = 0
     for i in range(number_of_iterations):
+
+
+
+        "Tutaj implementacja kolejnych funkcji podmian pojedyńczych "
+
+
+
+
+
         random_object_solution, road, data, taboo = random_object_solution.made_next_solution(random_object_solution,
                                                                                               road, data, taboo)
+
         if best_salary < data[1]:
             best_salary = data[1]
             best_road = copy.deepcopy(road)

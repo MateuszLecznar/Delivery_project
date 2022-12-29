@@ -6,8 +6,8 @@ if __name__ == "__main__":
 
 
 
-    long_taboo = [10,23, 30]
-    max_iter = 10000
+    long_taboo = [7,10,23, 30]
+    max_iter = 1000
 
 
     window(True, random_object_solution, road, long_taboo, max_iter)

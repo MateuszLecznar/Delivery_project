@@ -260,7 +260,9 @@ class Solver:
             taboo.append(used_swap)
             new_taboo_and_list_to_swap.append(taboo)
 
+        #Z taboo  z powrotem do tablicy możliwych podmian parami
         if len(taboo) >= self.max_taboo:  # Zmiana ile iterazji musi być w taboo podmiana
+
             list_to_swap_pairs.insert(0, taboo.pop(0))
 
         new_taboo_and_list_to_swap.append(list_to_swap_pairs)
@@ -282,6 +284,7 @@ class Solver:
 
         data = object.best_change_result(data[2], solution)
         object.check_solution(data[0])
+
         print_road(data[0])
 
         return object, data[0], data, taboo
