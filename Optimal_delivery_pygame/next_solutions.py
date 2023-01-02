@@ -25,9 +25,15 @@ def next_solution_by_iter(number_of_iterations, length_taboo, random_object_solu
 
     random_object_solution.lenght_taboo(length_taboo)
     list_to_swap = random_object_solution.list_to_swap_pairs()
+    list_to_swap= random_object_solution.create_mix_swap(list_to_swap)
+
 
     #Generowanie pierwszego rozwiązania
+    date=[None,None,None,None]
+
+
     data = random_object_solution.best_change_result(list_to_swap, road)
+
     random_object_solution.check_solution(data[0])
 
     print_road(data[0])

@@ -97,8 +97,9 @@ class Solver:
 
     def check_solution(self, route):
         """
-        Funkcja zliczająca czas na cały przejazd oraz sprwdza czy aktualnie w plecaku jest makxymalnie 3 zamówienia
+        Funkcja sprwdza czy aktualnie w plecaku jest makxymalnie 3 zamówienia
         """
+
         if route[0][1].islower():  # sprawdzamy czy pierwszy punkt jest miejscem dostawy czy odbiory zamówienia
             return False
         else:
@@ -119,13 +120,28 @@ class Solver:
             if backpack > self.backpack_volume:
                 return False
 
+        #Sprawdza poprawną kolejnosc
+        check_list=[]
+        flag=0
+        for el in route:
+            check_list.append(el)
+            if el[1].islower():
+                for before in check_list:
+                    if before[1].lower()==el[1]:
+
+                        #znajduje się restauracja przed punktem odbioru
+                        flag=1
+        if flag==0:
+            print("KOLEJNOSC SIE NIE ZGADZA")
+            return False
         time = 0
         prev_point = route[0]
         for point in route[1:]:
             time += self.cost_matrix[prev_point[0], point[0]]
             prev_point = point
 
-        return print("Cały przejazd trwa :", time)
+        #return print("Cały przejazd trwa :", time)
+        return True
 
     def calculate_single_delivery(self, route):
         """
@@ -133,6 +149,7 @@ class Solver:
         :param route: droga w postaci tablicy elementów z indeksem restauracji/punktu odbioru
         :return: tablica skąd dokąd i jak długo będzie trwała podróż
         """
+
         if route[0][
             1].islower():  # sprawdzamy czy pierwszy punkt jest miejscem dostawy czy odbiory zamówienia( sprawdza dane wejściowe)
             return False
@@ -175,13 +192,35 @@ class Solver:
             for copy_rest in copy_restaurants:
                 if rest[1] != copy_rest[1]:
                     list_restaurant_to_swap.append((rest[1], copy_rest[1]))
-                    list_to_swap_pairs_display.append((rest[1], copy_rest[1]))
+                    #list_to_swap_pairs_display.append((rest[1], copy_rest[1]))
             copy_restaurants.pop(0)
             # print(list_to_swap_pairs_display)
 
         return list_restaurant_to_swap
 
+    def create_mix_swap(self,list_restaurant_to_swap):
+        """
+        Funkcja dzięki przyjęciu tablicy możliwych podmian w dużych literach( restauracjach) tworzy
+        podmiany restauracji z odbiorem i odbiór z odbiorem
+
+        :param list_restaurant_to_swap:
+        :return:full_mix_list_to swap
+        """
+        base_list=copy.deepcopy(list_restaurant_to_swap)
+
+        #dodaje opcje odbiór z odbiorem
+        for el in base_list:
+            new_swap_small=el[0].lower(),el[1].lower()
+            new_swap_small_big=el[0],el[1].lower()
+            list_restaurant_to_swap.append(copy.deepcopy(new_swap_small))
+            list_restaurant_to_swap.append(copy.deepcopy(new_swap_small_big))
+
+        return list_restaurant_to_swap
+
+
+
     def best_change_result(self, swing_list, solution):
+        print(swing_list)
         """
                 Funkcja podmienia i przelicza czy po podmianie jest lepiej.
             Jeśli znajdzie najlepszą podmianę, podmieni i zwróci trasę i swing listę bez elementów podmiany
@@ -192,49 +231,110 @@ class Solver:
         :return: najlepsza droga, nagroda za tą trasę, reszta możliwych podmian, użyta podmiana
         """
 
-        best_salary = 0
-        orginal_solution = copy.deepcopy(solution)
-        best_solution = []
-        index_1_big = 0
-        index_2_big = 0
-        index_1_small = 0
-        index_2_small = 0
 
-        index_to_delate_from_swap_list = 0
+
+
+        best_solution =[]
+        best_salary = 0
+
+        index_to_delate_from_swap_list = None
 
         for swing in swing_list:
-            for i in range(len(solution)):
+            solution_swap_pair = copy.deepcopy(solution)
+            solution_swap_big_small = copy.deepcopy(solution)
+            solution_swap_small_small = copy.deepcopy(solution)
 
-                # PODMIANA DUŻYCH LITER
-                if solution[i][1] == swing[0]:
-                    index_1_big = i
+            index_1_big = 0
+            index_2_big = 0
+            index_1_small = 0
+            index_2_small = 0
+            #Podmiana Parami
+            if swing[0].isupper() and swing[1].isupper():
 
-                elif solution[i][1] == swing[1]:
-                    index_2_big = i
 
-                # podmiana małych liter
+                for i in range(len(solution_swap_pair)):
 
-                elif solution[i][1] == swing[0].lower():
-                    index_1_small = i
-                elif solution[i][1] == swing[1].lower():
-                    index_2_small = i
+                    # PODMIANA DUŻYCH LITER
+                    if solution_swap_pair[i][1] == swing[0]:
+                        index_1_big = i
 
-            solution[index_1_big], solution[index_2_big] = solution[index_2_big], solution[index_1_big]
-            solution[index_1_small], solution[index_2_small] = solution[index_2_small], solution[index_1_small]
+                    elif solution_swap_pair[i][1] == swing[1]:
+                        index_2_big = i
 
-            # porównanie nagrody
-            award = calculate_award_time(self.calculate_single_delivery(copy.deepcopy(solution)))
-            if award > best_salary:
-                index_to_delate_from_swap_list = swing_list.index(swing)
-                best_solution = copy.deepcopy(solution)
-                best_salary = award
+                    # podmiana małych liter
 
-            solution = copy.deepcopy(orginal_solution)
+                    elif solution_swap_pair[i][1] == swing[0].lower():
+                        index_1_small = i
+                    elif solution_swap_pair[i][1] == swing[1].lower():
+                        index_2_small = i
+
+                solution_swap_pair[index_1_big], solution_swap_pair[index_2_big] = solution_swap_pair[index_2_big], solution_swap_pair[index_1_big]
+                solution_swap_pair[index_1_small], solution_swap_pair[index_2_small] = solution_swap_pair[index_2_small], solution_swap_pair[index_1_small]
+
+                # porównanie nagrody
+                if self.check_solution(solution_swap_pair):
+
+                    award = calculate_award_time(self.calculate_single_delivery(copy.deepcopy(solution_swap_pair)))
+                    if award > best_salary:
+
+                        index_to_delate_from_swap_list = swing_list.index(swing)
+                        best_solution = solution_swap_pair
+                        best_salary = award
+
+            #Podmiana odbiór odbiór
+            if swing[0].islower() and swing[1].islower():
+
+                for i in range(len(solution_swap_small_small)):
+                    if solution_swap_small_small[i][1] == swing[0]:
+                        index_1_small = i
+                    if solution_swap_small_small[i][1] == swing[1]:
+                        index_2_small = i
+                solution_swap_small_small[index_1_small],solution_swap_small_small[index_2_small] = solution_swap_small_small[index_2_small],solution_swap_small_small[index_1_small]
+
+                if self.check_solution(solution_swap_small_small):
+                    award = calculate_award_time(self.calculate_single_delivery(copy.deepcopy(solution_swap_small_small)))
+                    if award > best_salary:
+                        index_to_delate_from_swap_list = swing_list.index(swing)
+                        best_solution = solution_swap_small_small
+                        best_salary = award
+
+            #Podmiana restauracja_odbiór
+            if swing[0].isupper() and swing[1].islower():
+
+                for i in range(len(solution_swap_big_small)):
+                    if solution_swap_big_small[i][1] == swing[0]:
+                        index_1_big = i
+                    if solution_swap_big_small[i][1] == swing[1]:
+                        index_2_big = i
+                solution_swap_big_small[index_1_big ], solution_swap_big_small[index_2_big] = solution_swap_big_small[index_2_big], solution_swap_big_small[index_1_big ]
+
+                if self.check_solution(solution_swap_big_small):
+
+
+                    award = calculate_award_time(
+                        self.calculate_single_delivery(copy.deepcopy(solution_swap_big_small)))
+                    if award > best_salary:
+                        print("PODMIANA______________")
+                        index_to_delate_from_swap_list = swing_list.index(swing)
+                        best_solution = solution_swap_big_small
+                        best_salary = award
+
+
+            #solution = copy.deepcopy(orginal_solution)
+
+        if best_salary<calculate_award_time(self.calculate_single_delivery(copy.deepcopy(solution))):
+            best_salary=calculate_award_time(self.calculate_single_delivery(copy.deepcopy(solution)))
+            best_solution=solution
 
         print("Nowa nagroda: ", best_salary, "PLN")
-        self.next_iter_next_award.append(best_salary)  # dopisanie nagrody
-        used_swap = swing_list.pop(index_to_delate_from_swap_list)
-        print("Nastąpiła najlepsza podmiana: ", used_swap)
+        self.next_iter_next_award.append(best_salary)# dopisanie nagrody
+        used_swap=None
+
+        if isinstance(index_to_delate_from_swap_list,int) :
+
+            used_swap = swing_list.pop(index_to_delate_from_swap_list)
+            print("Nastąpiła najlepsza podmiana: ", used_swap)
+
         return best_solution, best_salary, swing_list, used_swap
 
     def add_to_taboo(self, used_swap, taboo, list_to_swap_pairs):
@@ -252,6 +352,13 @@ class Solver:
         :return: new_taboo_and_list_to_swap -KROTKA: nowa lista taboo po aktualizacji (dodanie nowegio elementu i ewentualne wyrzucenie starego i lista możwliwych podmian
 
         """
+        if used_swap==None:
+             print("tu sie psuje")
+             new_taboo_and_list_to_swap = []
+             new_taboo_and_list_to_swap.append(taboo)
+             new_taboo_and_list_to_swap.append(list_to_swap_pairs)
+             return new_taboo_and_list_to_swap
+
 
         new_taboo_and_list_to_swap = []
         if taboo[0] == used_swap:
@@ -259,8 +366,7 @@ class Solver:
         else:
             taboo.append(used_swap)
             new_taboo_and_list_to_swap.append(taboo)
-
-        #Z taboo  z powrotem do tablicy możliwych podmian parami
+            #Z taboo  z powrotem do tablicy możliwych podmian parami
         if len(taboo) >= self.max_taboo:  # Zmiana ile iterazji musi być w taboo podmiana
 
             list_to_swap_pairs.insert(0, taboo.pop(0))
@@ -268,6 +374,11 @@ class Solver:
         new_taboo_and_list_to_swap.append(list_to_swap_pairs)
 
         return new_taboo_and_list_to_swap
+
+
+
+
+
 
     def made_next_solution(self, object, solution, data, taboo):
         """Funcka generuje rozwiązanie i wykonuje operacje do kolejnych iteracji"""
@@ -283,7 +394,7 @@ class Solver:
         print("Aktualna tablica taboo: ", taboo)
 
         data = object.best_change_result(data[2], solution)
-        object.check_solution(data[0])
+        #object.check_solution(data[0])
 
         print_road(data[0])
 

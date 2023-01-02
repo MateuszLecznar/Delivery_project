@@ -1,3 +1,4 @@
+from math import inf
 def calculate_award_time(time_):
     """
 
@@ -24,6 +25,7 @@ def calculate_award_time(time_):
             award = 10
         if i[2] < 40 and i[2] >= 30:
             award = 5
+
         sum_award += award
 
     return sum_award

@@ -28,3 +28,15 @@ def calculate_award_time(time_):
         sum_award += award
 
     return sum_award
+# def calculate_award_time(time_):
+#     """
+#
+#     :param time_: tablica elementów (skąd, dokąd, jaki czas)
+#     :return: Końcowa nagroda za przejazd
+#     """
+#     sum_award = 0
+#     for i in time_:
+#
+#         sum_award += i[2]
+#
+#     return sum_award
