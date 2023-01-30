@@ -5,14 +5,14 @@ from calculate_award import calculate_award_time
 from print_road import print_road
 
 
-def first_generate(matrix):
+def first_generate(matrix,size_penalty,weigth_penalty):
     print(matrix)
     """
     Funkcja generuje pierwsze losowe rozwiązanie
     :return: zwraca objekt tego rozwiązania i wytyczoną drogę
     """
 
-    object = Solver(matrix)
+    object = Solver(size_penalty,weigth_penalty,matrix,)
     road = object.create_init_solution()
     print("\nGenerowanie przykładowego rozwiązania:")
     print_road(road)

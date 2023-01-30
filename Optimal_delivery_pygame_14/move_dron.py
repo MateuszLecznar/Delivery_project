@@ -20,7 +20,7 @@ class Dron():
             dy = destination_y - self.y
 
             angle = math.atan2(dx, dy)
-            velocity = 15
+            velocity = 25
             if abs(dx) > 10:
                 destination_xv = math.sin(angle) * velocity
                 self.x += destination_xv
@@ -40,7 +40,7 @@ class Dron():
                 if destination_restaurant.letter == road[0]:
                     self.update_position(destination_restaurant.x, destination_restaurant.y)
                     self.draw(window)
-                    if abs(destination_restaurant.x - self.x) < 10 and abs(destination_restaurant.y - self.y) < 10:
+                    if abs(destination_restaurant.x - self.x) < 20 and abs(destination_restaurant.y - self.y) < 20:
                         road = road[1:]
                         restaurant.remove(destination_restaurant)
                         return road
@@ -50,7 +50,7 @@ class Dron():
                 if destination_man.letter == road[0]:
                     self.update_position(destination_man.x, destination_man.y)
                     self.draw(window)
-                    if abs(destination_man.x - self.x) < 10 and abs(destination_man.y - self.y) < 10:
+                    if abs(destination_man.x - self.x) < 20  and abs(destination_man.y - self.y) < 20:
                         road = road[1:]
                         men.remove(destination_man)
                         return road

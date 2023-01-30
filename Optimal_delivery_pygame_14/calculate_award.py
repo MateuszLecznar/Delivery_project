@@ -24,6 +24,8 @@ def calculate_award_time(time_):
             award = 10
         if i[2] < 40 and i[2] >= 30:
             award = 5
+        if i[2] >= 40:
+            award = -50
 
         sum_award += award
 

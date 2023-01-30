@@ -9,10 +9,12 @@ from calculate_award import calculate_award_time
 from print_road import print_road
 
 
+
 class Solver:
     """
     Klasa naszego rozwiązania
     """
+
     # cost_matrix = np.array(
     #
     #     [[inf, 3, 10, 6, 2, 7, 3, 10, 9, 4, 2, 3, 10, 9, 8, 10, 4, 6, 5, 6],
@@ -38,15 +40,18 @@ class Solver:
     # )
 
 
-    def __init__(self,cost_matrix=None):
+    def __init__(self,size_penalty, weigth_penalty, cost_matrix=None):
         if cost_matrix is not None:
             self.cost_matrix=np.array(cost_matrix)
+            self.size_penalty = size_penalty
+            self.weigth_penalty = weigth_penalty
     backpack_volume = 3
-    max_taboo = 23
+    penalty_table=[]
+
     next_iter_next_award = []
 
     def lenght_taboo(self, lenght_taboo):
-        self.max_taboo = lenght_taboo
+        self.max_taboo = int(lenght_taboo)
 
     restaurants = [Order.A, Order.B, Order.C, Order.D, Order.E, Order.F, Order.G, Order.H, Order.I,
                    Order.J,Order.K,Order.L,Order.M,Order.N]  # przypisanie restauracji
@@ -105,11 +110,13 @@ class Solver:
         Funkcja sprwdza czy aktualnie w plecaku jest makxymalnie 3 zamówienia
         """
         #print(self.cost_matrix)
-
-        if route[0][1].islower():  # sprawdzamy czy pierwszy punkt jest miejscem dostawy czy odbiory zamówienia
+        try:
+            if route[0][1].islower():  # sprawdzamy czy pierwszy punkt jest miejscem dostawy czy odbiory zamówienia
+                return False
+            else:
+                tmp = [route[0]]
+        except:
             return False
-        else:
-            tmp = [route[0]]
 
         for el in route[1:]:
             if el[1].islower() and (el[0] - 1, el[1].upper()) not in tmp:
@@ -274,14 +281,18 @@ class Solver:
                         index_1_small = i
                     elif solution_swap_pair[i][1] == swing[1].lower():
                         index_2_small = i
-
-                solution_swap_pair[index_1_big], solution_swap_pair[index_2_big] = solution_swap_pair[index_2_big], solution_swap_pair[index_1_big]
-                solution_swap_pair[index_1_small], solution_swap_pair[index_2_small] = solution_swap_pair[index_2_small], solution_swap_pair[index_1_small]
-
+                try:
+                    solution_swap_pair[index_1_big], solution_swap_pair[index_2_big] = solution_swap_pair[index_2_big], solution_swap_pair[index_1_big]
+                    solution_swap_pair[index_1_small], solution_swap_pair[index_2_small] = solution_swap_pair[index_2_small], solution_swap_pair[index_1_small]
+                except:
+                    pass
                 # porównanie nagrody
                 if self.check_solution(solution_swap_pair):
 
                     award = calculate_award_time(self.calculate_single_delivery(copy.deepcopy(solution_swap_pair)))
+                    if self.penalty_foo(swing):
+                        award = award - self.weigth_penalty
+
                     if award > best_salary:
 
                         index_to_delate_from_swap_list = swing_list.index(swing)
@@ -296,10 +307,14 @@ class Solver:
                         index_1_small = i
                     if solution_swap_small_small[i][1] == swing[1]:
                         index_2_small = i
-                solution_swap_small_small[index_1_small],solution_swap_small_small[index_2_small] = solution_swap_small_small[index_2_small],solution_swap_small_small[index_1_small]
-
+                try:
+                    solution_swap_small_small[index_1_small],solution_swap_small_small[index_2_small] = solution_swap_small_small[index_2_small],solution_swap_small_small[index_1_small]
+                except:
+                    pass
                 if self.check_solution(solution_swap_small_small):
                     award = calculate_award_time(self.calculate_single_delivery(copy.deepcopy(solution_swap_small_small)))
+                    if self.penalty_foo(swing):
+                        award = award - self.weigth_penalty
                     if award > best_salary:
                         index_to_delate_from_swap_list = swing_list.index(swing)
                         best_solution = solution_swap_small_small
@@ -313,13 +328,17 @@ class Solver:
                         index_1_big = i
                     if solution_swap_big_small[i][1] == swing[1]:
                         index_2_big = i
-                solution_swap_big_small[index_1_big ], solution_swap_big_small[index_2_big] = solution_swap_big_small[index_2_big], solution_swap_big_small[index_1_big ]
-
+                try:
+                    solution_swap_big_small[index_1_big ], solution_swap_big_small[index_2_big] = solution_swap_big_small[index_2_big], solution_swap_big_small[index_1_big ]
+                except:
+                    pass
                 if self.check_solution(solution_swap_big_small):
 
 
                     award = calculate_award_time(
                         self.calculate_single_delivery(copy.deepcopy(solution_swap_big_small)))
+                    if self.penalty_foo(swing):
+                        award = award - self.weigth_penalty
                     if award > best_salary:
 
                         index_to_delate_from_swap_list = swing_list.index(swing)
@@ -406,3 +425,24 @@ class Solver:
         #print_road(data[0])#####################################################################################################
 
         return object, data[0], data, taboo
+
+    def penalty_foo(self,new_swap):
+        """
+
+        :param used_swap_table: możlwie wszystkie podmiany
+        :param new_swap: element do sprawdzenia czy funzka kary ma dac kare
+        :return: sprawdzenie czy kara wystąpi
+        """
+        for el in self.penalty_table:
+            if el[0] == new_swap:
+                tem = copy.deepcopy(el[0])
+                tem1 = copy.deepcopy(el[1] + 1)
+                self.penalty_table.append((tem, tem1))
+                #print(el)
+                self.penalty_table.remove(el)
+                if el[1] >= self.size_penalty - 1:
+
+                    return True
+                else:
+                    return False
+        return False

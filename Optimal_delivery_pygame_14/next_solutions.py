@@ -25,7 +25,15 @@ def next_solution_by_iter(number_of_iterations, length_taboo, random_object_solu
 
     random_object_solution.lenght_taboo(length_taboo)
     list_to_swap = random_object_solution.list_to_swap_pairs()
-    list_to_swap= random_object_solution.create_mix_swap(list_to_swap)
+    list_to_swap= random_object_solution.create_mix_swap(list_to_swap) #
+    #print(len(list_to_swap))
+
+
+    #dodanie tablicy kary
+    penalty_tab=[]
+    for el in list_to_swap:
+        penalty_tab.append((el,0))
+    random_object_solution.penalty_table = penalty_tab
 
 
     #Generowanie pierwszego rozwiązania

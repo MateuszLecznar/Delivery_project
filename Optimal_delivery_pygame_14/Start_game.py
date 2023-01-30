@@ -1,4 +1,5 @@
 import copy
+import random
 import time
 import numpy as np
 import pygame
@@ -14,7 +15,7 @@ from next_solutions import next_solution_by_iter
 from print_road import road_str_without_arrow,print_road
 from generate_rand_solution import first_generate
 
-def window(start,long_taboo, max_iter):
+def window(start,long_taboo, max_iter,size_penalty,weigth_penalty):
     if start:
 
         pygame.init()
@@ -22,6 +23,13 @@ def window(start,long_taboo, max_iter):
         count_order = 0
         max_restaurants = 14
         men = []
+        for i in range(14): #Automatyczne generowanie miejsc dostaw
+            mx = random.randint(100, 1300)
+            my = random.randint(100, 900)
+            men.append(Hungry_man(mx,my,i))
+            count_order = i+1
+            print(count_order)
+
         list_restaurant = generate_restaurant(True)
 
         out_matrix = []
@@ -51,13 +59,15 @@ def window(start,long_taboo, max_iter):
             time.sleep(0.03)
 
             best_finish_road = []
-
+            if flag_single_show:
+                element_to_display(count_order, max_restaurants, positions_restaurants, men, list_restaurant, window)
+                pygame.display.update()
             if count_order == max_restaurants and flag_single_show:
                 flag_single_show = False
                 flag_button_show = True
 
                 out_matrix = prepared_matrix(count_order, men, list_restaurant)
-                random_object_solution, road = first_generate(out_matrix)
+                random_object_solution, road = first_generate(out_matrix,size_penalty,weigth_penalty)
                 best_salary = 0
 
 
@@ -89,10 +99,13 @@ def window(start,long_taboo, max_iter):
                     dron.draw(window)
 
             pygame.display.update()
+            if len(men)==0 and len(list_restaurant)==0 and flag_button_show:
+                run = False
+        pygame.quit()
 
-        for el in out_matrix.tolist():
-            print(el,"\n")
+        # for el in out_matrix.tolist():
+        #     print(el,"\n")
 
 
         print_road(road)
-        return 0
+        return
